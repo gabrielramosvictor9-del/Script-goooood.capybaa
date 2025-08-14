@@ -2,6 +2,8 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
 local player = Players.LocalPlayer
 
 -- Usa PlayerGui ao invés de CoreGui
@@ -10,10 +12,10 @@ gui.Name = "SideMenuGui"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
--- Interface Lateral
+-- Interface Lateral centralizada
 local menu = Instance.new("Frame")
-menu.Size = UDim2.new(0, 0, 0, 320)
-menu.Position = UDim2.new(0, 0, 0.1, 0)
+menu.Size = UDim2.new(0, 0, 0, 260) -- altura menor
+menu.Position = UDim2.new(0.5, -90, 0.5, -130) -- centralizado
 menu.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 menu.BorderSizePixel = 0
 menu.ClipsDescendants = true
@@ -21,38 +23,39 @@ menu.Visible = true
 menu.Parent = gui
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
+title.Size = UDim2.new(1, 0, 0, 25) -- menor
 title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 title.Text = "goooood.capybara"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.SourceSansBold
-title.TextSize = 18
+title.TextSize = 16
 title.Parent = menu
 
+-- Botão toggle no topo da tela
 local toggle = Instance.new("TextButton")
-toggle.Size = UDim2.new(0, 40, 0, 40)
-toggle.Position = UDim2.new(0, 10, 0, 10)
+toggle.Size = UDim2.new(0, 35, 0, 35)
+toggle.Position = UDim2.new(0.5, -17, 0.5, -180) -- acima do menu
 toggle.Text = "≡"
 toggle.Font = Enum.Font.SourceSansBold
-toggle.TextSize = 26
+toggle.TextSize = 24
 toggle.TextColor3 = Color3.new(1, 1, 1)
 toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 toggle.Parent = gui
 
-local openSize = UDim2.new(0, 180, 0, 320)
-local closedSize = UDim2.new(0, 0, 0, 320)
+local openSize = UDim2.new(0, 180, 0, 260)
+local closedSize = UDim2.new(0, 0, 0, 260)
 local open = false
 local buttons = {}
 
 local function createButton(name, yOffset, color)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 160, 0, 35)
-    btn.Position = UDim2.new(0, 10, 0, yOffset)
+    btn.Size = UDim2.new(0, 150, 0, 28) -- botão menor
+    btn.Position = UDim2.new(0, 15, 0, yOffset)
     btn.BackgroundColor3 = color or Color3.fromRGB(0, 120, 215)
     btn.TextColor3 = Color3.new(1, 1, 1)
     btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 16
+    btn.TextSize = 14
     btn.Text = name
     btn.Visible = false
     btn.Parent = menu
@@ -102,15 +105,15 @@ local function applyESP(plr)
     table.insert(espConnections, conn)
 end
 
--- Funcionalidades
-local tp = createButton("Teleport Tool", 40, Color3.fromRGB(0, 140, 200))
+-- Botões compactos
+local tp = createButton("Teleport Tool", 30, Color3.fromRGB(0, 140, 200))
 tp.MouseButton1Click:Connect(function()
     pcall(function()
         loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Teleport-Tools-34066"))()
     end)
 end)
 
-local speed = createButton("Velocidade", 85, Color3.fromRGB(0, 170, 0))
+local speed = createButton("Velocidade", 65, Color3.fromRGB(0, 170, 0))
 local speedLevels = {16, 50, 100}
 local speedIdx = 1
 speed.MouseButton1Click:Connect(function()
@@ -122,7 +125,7 @@ speed.MouseButton1Click:Connect(function()
     end
 end)
 
-local jump = createButton("Super Pulo", 130, Color3.fromRGB(200, 120, 0))
+local jump = createButton("Super Pulo", 100, Color3.fromRGB(200, 120, 0))
 local jumping = false
 jump.MouseButton1Click:Connect(function()
     local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
@@ -133,7 +136,7 @@ jump.MouseButton1Click:Connect(function()
     end
 end)
 
-local noclip = createButton("Noclip", 175, Color3.fromRGB(170, 0, 170))
+local noclip = createButton("Noclip", 135, Color3.fromRGB(170, 0, 170))
 local clipOn = false
 local connNoclip
 noclip.MouseButton1Click:Connect(function()
@@ -157,7 +160,7 @@ noclip.MouseButton1Click:Connect(function()
     end
 end)
 
-local espButton = createButton("ESP (Health)", 220, Color3.fromRGB(0, 170, 170))
+local espButton = createButton("ESP (Health)", 170, Color3.fromRGB(0, 170, 170))
 espButton.MouseButton1Click:Connect(function()
     espEnabled = not espEnabled
     espButton.Text = espEnabled and "ESP (Health): ON" or "ESP (Health): OFF"
@@ -184,4 +187,17 @@ espButton.MouseButton1Click:Connect(function()
         end
         espConnections = {}
     end
+end)
+
+-- Fly
+local flyButton = createButton("Fly", 205, Color3.fromRGB(0, 120, 215))
+flyButton.MouseButton1Click:Connect(function()
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    pcall(function()
+        if isMobile then
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/396abc/Script/refs/heads/main/MobileFly.lua", true))()
+        else
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/396abc/Script/refs/heads/main/FlyR15.lua", true))()
+        end
+    end)
 end)
